@@ -1,36 +1,38 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <title>Negociações</title>
     <link rel="stylesheet" href="css/bootstrap.css">
     <link rel="stylesheet" href="css/bootstrap-theme.css">
-    
+
 </head>
+
 <body class="container">
-    
+
     <h1 class="text-center">Negociações</h1>
-    
+
     <form class="form">
-        
+
         <div class="form-group">
             <label for="data">Data</label>
-            <input type="date" id="data" class="form-control" required autofocus/>        
-        </div>    
-        
+            <input type="date" id="data" class="form-control" required autofocus />
+        </div>
+
         <div class="form-group">
             <label for="quantidade">Quantidade</label>
-            <input type="number" min="1" step="1" id="quantidade" class="form-control" value="1" required/>
+            <input type="number" min="1" step="1" id="quantidade" class="form-control" value="1" required />
         </div>
-        
+
         <div class="form-group">
             <label for="valor">Valor</label>
-            <input id="valor" type="number" class="form-control"  min="0.01" step="0.01" value="0.0" required />
+            <input id="valor" type="number" class="form-control" min="0.01" step="0.01" value="0.0" required />
         </div>
-        
+
         <button class="btn btn-primary" type="submit">Incluir</button>
     </form>
-    
+
     <div class="text-center">
         <button class="btn btn-primary text-center" type="button">
             Importar Negociações
@@ -38,10 +40,10 @@
         <button class="btn btn-primary text-center" type="button">
             Apagar
         </button>
-    </div> 
+    </div>
     <br>
     <br>
-    
+
     <table class="table table-hover table-bordered">
         <thead>
             <tr>
@@ -51,13 +53,83 @@
                 <th>VOLUME</th>
             </tr>
         </thead>
-        
+
         <tbody>
         </tbody>
-        
+
         <tfoot>
         </tfoot>
     </table>
-    <script src="js/index.js"></script>
+    <script src="js/app/models/Negociacao.js"></script>
+    <script>
+
+        /*
+            //teste com o 1º construtor feito
+            //necessario ter o new antes de negociação para instanciar a classe
+            //new cria um this(variável implícita) para cada objeto
+            var n1 = new Negociacao();
+            console.log('N1', n1);
+            n1.quantidade = 10;
+            n1.valor = 20.50;
+            console.log('N1', n1);
+        */
+
+        var n2 = new Negociacao(new Date, 10, 15.6);
+        console.log('N2', n2);
+        /*
+            //teste métodos get originais
+            console.log(n2.getData());
+            console.log(n2.getQuantidade());
+            console.log(n2.getValor());
+            console.log(n2.getVolume())
+        */
+
+        //teste métodos get "reduzido"
+        console.log(n2.data);
+        console.log(n2.quantidade);
+        console.log(n2.valor);
+        console.log(n2.volume)
+
+        /*
+            //ambos os metodos get permitiam alterar n2 fazendo n2._quantidade=20;
+            n2._quantidade=20;
+            console.log(n2.quantidade);
+        */
+
+        /*
+            //conjelando o objeto não permite alterar n2
+            //mas não é pratico ter que cancelar toda vez que criar um objeto
+            //por isso passamos o freeze para dentro do construtor
+            Object.freeze(n2)
+            console.log(Object.isFrozen(n2));
+            n2._quantidade=1000000;
+            console.log(n2.quantidade);
+        */
+
+        //mesmo com o freeze no construtor isso não impede de modificar propriedades de objeto dentro dele
+        //por isso alteramos o getData para retornar uma cópia da data
+        console.log(n2.data);
+        n2.data.setDate(11);
+        console.log(n2.data);
+
+        //ainda assim seria possível mudar a data passando uma variável como parâmetro
+        //para evitar isso temos que mudar o constutor para fazer uma cópia da data passada
+        var hoje = new Date();
+        var n3 = new Negociacao(hoje, 5, 700)
+        console.log(n3.data);
+        hoje.setDate(11)
+        console.log(n3.data);
+
+        //outra diaca é apartir de agora trocar var por let
+        //pois let tem escopo de bloco e var não
+        for(var i=0; i<=100; i++){
+            let nome='Julinha';
+        }
+        alert(i);    //Retorna 101
+        alert(nome); //Erro nome não definido
+        
+
+    </script>
 </body>
+
 </html>
