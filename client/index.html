@@ -13,7 +13,7 @@
 
     <h1 class="text-center">Negociações</h1>
 
-    <form class="form">
+    <form class="form" onsubmit="negociacaoController.adiciona(event)">
 
         <div class="form-group">
             <label for="data">Data</label>
@@ -61,74 +61,10 @@
         </tfoot>
     </table>
     <script src="js/app/models/Negociacao.js"></script>
+    <script src="js/app/controllers/NegociacaoController.js"></script>
     <script>
-
-        /*
-            //teste com o 1º construtor feito
-            //necessario ter o new antes de negociação para instanciar a classe
-            //new cria um this(variável implícita) para cada objeto
-            var n1 = new Negociacao();
-            console.log('N1', n1);
-            n1.quantidade = 10;
-            n1.valor = 20.50;
-            console.log('N1', n1);
-        */
-
-        var n2 = new Negociacao(new Date, 10, 15.6);
-        console.log('N2', n2);
-        /*
-            //teste métodos get originais
-            console.log(n2.getData());
-            console.log(n2.getQuantidade());
-            console.log(n2.getValor());
-            console.log(n2.getVolume())
-        */
-
-        //teste métodos get "reduzido"
-        console.log(n2.data);
-        console.log(n2.quantidade);
-        console.log(n2.valor);
-        console.log(n2.volume)
-
-        /*
-            //ambos os metodos get permitiam alterar n2 fazendo n2._quantidade=20;
-            n2._quantidade=20;
-            console.log(n2.quantidade);
-        */
-
-        /*
-            //conjelando o objeto não permite alterar n2
-            //mas não é pratico ter que cancelar toda vez que criar um objeto
-            //por isso passamos o freeze para dentro do construtor
-            Object.freeze(n2)
-            console.log(Object.isFrozen(n2));
-            n2._quantidade=1000000;
-            console.log(n2.quantidade);
-        */
-
-        //mesmo com o freeze no construtor isso não impede de modificar propriedades de objeto dentro dele
-        //por isso alteramos o getData para retornar uma cópia da data
-        console.log(n2.data);
-        n2.data.setDate(11);
-        console.log(n2.data);
-
-        //ainda assim seria possível mudar a data passando uma variável como parâmetro
-        //para evitar isso temos que mudar o constutor para fazer uma cópia da data passada
-        var hoje = new Date();
-        var n3 = new Negociacao(hoje, 5, 700)
-        console.log(n3.data);
-        hoje.setDate(11)
-        console.log(n3.data);
-
-        //outra diaca é apartir de agora trocar var por let
-        //pois let tem escopo de bloco e var não
-        for(var i=0; i<=100; i++){
-            let nome='Julinha';
-        }
-        alert(i);    //Retorna 101
-        alert(nome); //Erro nome não definido
-        
-
+        //instanciar controller
+        let negociacaoController = new NegociacaoController;
     </script>
 </body>
 
