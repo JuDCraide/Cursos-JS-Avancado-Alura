@@ -9,22 +9,25 @@ class NegociacaoController {
         this._inputValor = $('#valor');
         this._listaNegociacoes = new ListaNegociacoes();
         
-        //dizemos que a tabela deve ser criada dentro da div com o id negociacoes-view
         this._negociacoesView =  new NegociacoesView($('#negociacoes-view'));
-        //atualizamos a tabela para ela iniciar mesmo sem nenhum item
-        //passamos para update o modelo da lista 
         this._negociacoesView.update(this._listaNegociacoes);
+
+        this._mensagem = new Mensagem();
+        this._mensagemView = new MensagemView($('#mensagem-view'));
+        this._mensagemView.update(this._mensagem);
     }
 
     adiciona(event) {
 
         event.preventDefault();
-        
+    
         this._listaNegociacoes.adiciona(this._criaNegociacao())
+        
+        //adiciona mensegem sucesso
+        this._mensagem.texto = 'Negociação adicionada';
+        this._mensagemView.update(this._mensagem);
 
-        this._limpaFormulario()
-
-        //console.log(this._listaNegociacoes.negociacoes);
+        this._limpaFormulario();
 
         this._negociacoesView.update(this._listaNegociacoes);
     }
