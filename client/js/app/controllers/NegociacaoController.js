@@ -8,45 +8,27 @@ class NegociacaoController {
         this._inputQuantidade = $('#quantidade');
         this._inputValor = $('#valor');
         this._listaNegociacoes = new ListaNegociacoes();
+        
+        //dizemos que a tabela deve ser criada dentro da div com o id negociacoes-view
+        this._negociacoesView =  new NegociacoesView($('#negociacoes-view'));
+        //atualizamos a tabela para ela iniciar mesmo sem nenhum item
+        //passamos para update o modelo da lista 
+        this._negociacoesView.update(this._listaNegociacoes);
     }
 
     adiciona(event) {
 
         event.preventDefault();
         
-        /*
-        //passamos a responsobilidade de fazer as conversões de tipo de data para um helper
-        //ao delclarar os métodos como static não precisamos mais da instância
-        //let helper = new DateHelper()
-        let negociacao = new Negociacao(
-            //helper.textoParaData(this._inputData.value),
-            DataHelper.textoParaData(this._inputData.value),
-            this._inputQuantidade.value,
-            this._inputValor.value,
-        );
-
-        //console.log(negociacao);
-        */
-
-        
-        //imprime data no formato feito pelo DataHelper
-        //console.log(DataHelper.dataParaTexto(negociacao.data));
-
-        //adicionamos a negociação a lista
         this._listaNegociacoes.adiciona(this._criaNegociacao())
 
         this._limpaFormulario()
 
-        //podemos quebrar com a lista de negociacoes
-        //zeramos ela ao por o tamanho em 0 e podemos incluir usando push
-        //para barrar isso fizemos o get negociacões retornar uma cópia
-        /*this._listaNegociacoes.negociacoes.length = 0;
-        this._listaNegociacoes.negociacoes.push(new Date(),5,1.2);*/
-        
-        console.log(this._listaNegociacoes.negociacoes);
+        //console.log(this._listaNegociacoes.negociacoes);
+
+        this._negociacoesView.update(this._listaNegociacoes);
     }
 
-    //substituimos o código de criacção de negociação por uma função
     _criaNegociacao() {
         return new Negociacao(
             DataHelper.textoParaData(this._inputData.value),
@@ -55,7 +37,6 @@ class NegociacaoController {
         );
     }
 
-    //criamos função de limpar para melhorar experiencia do usuário
     _limpaFormulario() {
 
         this._inputData.value='';
