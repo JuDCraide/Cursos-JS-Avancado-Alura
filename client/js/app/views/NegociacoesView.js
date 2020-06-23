@@ -1,16 +1,10 @@
 
 class NegociacoesView extends View {
 
-    /*constructor(elemento) {
-        this._elemento = elemento;
-    }*/
-
     constructor(elemento) {
         super(elemento);
     }
 
-    //também resolvemos tirar o _ de _template porque como as classes filhas tem acesso
-    // ao template da classe View ele não é mais privado
     template(model) {
         return `
             <table class="table table-hover table-bordered" >
@@ -45,9 +39,6 @@ class NegociacoesView extends View {
             </table >
         `;
     }
-   /* update(model) {
-        this._elemento.innerHTML = this._template(model);
-    }*/
-
+  
 }
 
