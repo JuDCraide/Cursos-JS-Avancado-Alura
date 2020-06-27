@@ -1,29 +1,22 @@
 class ListaNegociacoes {
 
-    constructor(contexto, armadilha){
+    constructor(armadilha){
         this._negociacoes = [];
         
-        //criamos uma armadilha para não ter que lembrar toda a vez de dar update na view
-        this._armadilha = armadilha;
-        
-        //passamos o contexto onde devemos executar a função de armadilha
-        //this._contexto = contexto;
-        //mas vamos fazer de outro jeito sem contexto
+        //esse código de armadilha faz parte da infraestrutura
+        //não deveria estar no modelo, pq pode impedir ele de ser reusado
+        //this._armadilha = armadilha;
     }
 
     adiciona(negociacao){
-        this._negociacoes.push(negociacao);
-        //chamamos a armadilha usando this que é o próprio modelo
-        //this._armadilha(this);
-        
-        //ao invés de chamar só a função temos que usar API de relfexão
-        //para fazer a armadilha rodar no contexto certo
-        //a função applay recebe, o método, o contexto p executar e um array com parâmetros para corrigir o this
-        //Reflect.apply(this._armadilha, this._contexto, [this]);
 
-        //mas existe outra forma de fazer sem usam API  de relfexão
-        //por isso voltamos para o mesma forma de chamar a armadilha
-        this._armadilha(this);
+        this._negociacoes.push(negociacao);
+
+        //é possível forçar um set para poder usar o Proxy
+        //mas isso causa problemas de performace então voltamos atrás
+        //this._negociacoes = [].concat(this._negociacoes, negociacao);        
+
+        //this._armadilha(this);
     }
 
     get negociacoes() {
@@ -33,10 +26,8 @@ class ListaNegociacoes {
   
     esvazia() {
         this._negociacoes = [];
+    
         //this._armadilha(this);
-        //Reflect.apply(this._armadilha, this._contexto, [this]);
-
-        this._armadilha(this);
     }
 
 }

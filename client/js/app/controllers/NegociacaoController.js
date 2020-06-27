@@ -8,26 +8,38 @@ class NegociacaoController {
         this._inputQuantidade = $('#quantidade');
         this._inputValor = $('#valor');
         
-        //fizemos a armadilha que será chamada após adiciona ou esvazia
-        //podemos passar o negociacoesView mesmo criando ele depois
-        //só com a função não funciona porque o this é dinâmico e varia com contxto
-        /*this._listaNegociacoes = new ListaNegociacoes(function(model) {
+        //por armadilhas no modelo não é uma boa prática
+        //por isso vamos usar Proxy
+        /*this._listaNegociacoes = new ListaNegociacoes((model) => {
             this._negociacoesView.update(model);
         });*/
         
-        //por isso precisamos passar a propriedade this para o construtor
-        //Assim ele vai guardar o contexto da classe NegociacaoController
-        /*this._listaNegociacoes = new ListaNegociacoes(this, function(model) {
-            this._negociacoesView.update(model);
-        });*/
-        
-        //mas existe outra solução, só trocar para arrow function funciona
-        //isso ocorre pois arrow functions tem this léxico
-        //ao invés de dinâmico como o das funções normais
-        //ou seja o this não muda de acordo com o contexto
-        this._listaNegociacoes = new ListaNegociacoes((model) => {
-            this._negociacoesView.update(model);
+        //macete para guardar this do controller em self
+        //e poder chamar dentro da função    
+        let self = this;
+
+        //agora implementamos o que testamos no index.js no controller
+        this._listaNegociacoes = new Proxy(new ListaNegociacoes(), {
+            
+            get(target, prop, receiver) {
+               
+                if(['adiciona','esvazia'].includes(prop) && typeof(target[prop]) == typeof(Function)){                   
+                    return function() {
+                        console.log(`interceptando ${prop}`);                        
+
+                        Reflect.apply(target[prop], target, arguments);
+
+                        //chamamos a função update usando o self ao invés de this
+                        //e passamos o target pq ele é o modelo
+                        self._negociacoesView.update(target);
+                    }
+                }
+
+                return Reflect.get(target, prop, receiver)
+                
+            }   
         });
+
         this._negociacoesView =  new NegociacoesView($('#negociacoes-view'));
         this._negociacoesView.update(this._listaNegociacoes);
 
@@ -47,13 +59,11 @@ class NegociacaoController {
 
         this._limpaFormulario();
 
-        //como vamos fazer a armadilha não vamos precisar mais chamar a função
-        //this._negociacoesView.update(this._listaNegociacoes);
     }
 
     apaga() {
         this._listaNegociacoes.esvazia();
-        //this._negociacoesView.update(this._listaNegociacoes);
+
 
         this._mensagem.texto = 'Negociações apagadas'
         this._mensagemView.update(this._mensagem);
