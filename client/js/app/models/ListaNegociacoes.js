@@ -18,4 +18,12 @@ class ListaNegociacoes {
         this._negociacoes = [];
     }
 
+    //método para pegar total usado na tabela
+
+    get volumeTotal(){
+        return this._negociacoes.reduce(
+            (total, n) => total + n.volume, 0.0 
+        )
+    }
+
 }

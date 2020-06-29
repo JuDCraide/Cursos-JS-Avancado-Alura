@@ -1,11 +1,9 @@
 class DataHelper {
-
     
     constructor() {
         throw new Error('A classe DateHelper não pode ser instânciada');
     }
 
-    
     static dataParaTexto(data) {
 
         

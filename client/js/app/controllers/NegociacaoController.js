@@ -1,115 +1,132 @@
 class NegociacaoController {
 
-    constructor() {
+  constructor() {
 
-        let $ = document.querySelector.bind(document);
+    let $ = document.querySelector.bind(document);
 
-        this._inputData = $('#data');
-        this._inputQuantidade = $('#quantidade');
-        this._inputValor = $('#valor');
+    this._inputData = $('#data');
+    this._inputQuantidade = $('#quantidade');
+    this._inputValor = $('#valor');
 
-        //não precisaremos mais do self
-        //let self = this;
-        /*this._listaNegociacoes = new Proxy(new ListaNegociacoes(), {
-            get(target, prop, receiver) {
-                if(['adiciona','esvazia'].includes(prop) && typeof(target[prop]) == typeof(Function)){                   
-                    return function() {
-                        console.log(`interceptando ${prop}`);                        
+    this._listaNegociacoes = new Bind(
+      new ListaNegociacoes(),
+      new NegociacoesView($('#negociacoes-view')),
+      'adiciona',
+      'esvazia'
+    )
 
-                        Reflect.apply(target[prop], target, arguments);
-                        self._negociacoesView.update(target);
-                    }
-                }
-                return Reflect.get(target, prop, receiver)
-            }   
-        });*/
+    this._mensagem = new Bind(
+      new Mensagem(),
+      new MensagemView($('#mensagem-view')),
+      'texto'
+    )
 
-        //chamamos o criador de Proxy ao invés de criar um Proxy
-        /*this._listaNegociacoes = ProxyFactory.create(
-            new ListaNegociacoes(),
-            ['adiciona', 'esvazia'],
-            (model) => this._negociacoesView.update(model)
-        );*/
+  }
 
-        //mas mesmo com a Proxy ainda precisamos chamar update na criação
-        //por isso vamos criar a classe Bind, e trocar a criação com proxy por ela
-        //também percebemos que não precisamos criar _negociacoesView
-        //pq ela não é usada em nenhum lugar a não ser no Bind
-        //this._negociacoesView = new NegociacoesView($('#negociacoes-view'));
-        this._listaNegociacoes = new Bind(
-            new ListaNegociacoes(),
-            //this._negociacoesView,
-            new NegociacoesView($('#negociacoes-view')),
-            //a última mudança que vamos fazer é ao invés de passar um array
-            //vamos passar direto as strings com os nomes das props
-            //['adiciona', 'esvazia'],
-            'adiciona',
-            'esvazia'
-        )
-        //this._negociacoesView.update(this._listaNegociacoes);
+  adiciona(event) {
 
+    event.preventDefault();
+    this._listaNegociacoes.adiciona(this._criaNegociacao());
+    this._mensagem.texto = 'Negociação adicionada';
+    this._limpaFormulario();
 
-        //this._mensagem = new Mensagem();
-        //chamamos o criador de Proxy para mensagem também
-        /*this._mensagem = ProxyFactory.create(
-            new Mensagem(),
-            ['texto'],
-            (model) => this._mensagemView.update(model)
-        );*/
-        //mas mesmo com a Proxy ainda precisamos chamar update na criação
-        //por isso vamos criar a classe Bind, e trocar a criação com proxy por ela
-        //também percebemos que não precisamos criar _mensagemView
-        //pq ela não é usada em nenhum lugar a não ser no Bind
-        //this._mensagemView = new MensagemView($('#mensagem-view'));
-        this._mensagem = new Bind(
-            new Mensagem(),
-            //this._mensagemView,
-            new MensagemView($('#mensagem-view')),
-            //a última mudança que vamos fazer é ao invés de passar um array
-            //vamos passar direto as strings com os nomes das props
-            //['texto'],
-            'texto'
-        )
-        //this._mensagemView.update(this._mensagem);
+  }
 
-    }
+  //iniciamos a API e nosso objetivo é quando o botão importar negociações for clicado
+  //vamos chamar a função que vai retornar as negociações usando requisições AJAX
+  importaNegociacoes() {
+    //alert('Importando...');
 
-    adiciona(event) {
+    /*
+    let xhr = new XMLHttpRequest();
 
-        event.preventDefault();
+    xhr.open('GET', 'negociacoes/semana');
+    //endereço errado para testar erro
+    //xhr.open('GET', 'negociacoes/semana2');
 
-        this._listaNegociacoes.adiciona(this._criaNegociacao()); 
+    //precisamos fazer configurações antes de enviar
+    xhr.onreadystatechange = () => {
+      /*
+      Estados de uma requisição AJAX:
+      0: requisição ainda não iniciada
+      1: conexão com o servidor estabelecida
+      2: requisição recebida
+      3: processando requisição
+      4: requisição está concluída e a resposta está pronta
+      * /
+      //testa se está no último estado ou seja a resposta está pronta
+      if (xhr.readyState === 4) {
+        //mas pode ter ocorrido erro então testamos se o status é 200(OK)
+        if (xhr.status === 200) {
+          console.log('Requisição OK, obtendo as negociações do servidor.');
+          //xhr.responseText mostra a resposta da requisição
+          //usamos JSON.parse para converter de texto para objeto JavaScript
+          console.log(JSON.parse(xhr.responseText));
 
-        this._mensagem.texto = 'Negociação adicionada';
-        //this._mensagemView.update(this._mensagem);
+          JSON.parse(xhr.responseText)
+            .map(
+              //transforma cada objeto retornado pela requisição em uma negociação
+              objeto => new Negociacao(new Date(objeto.data), objeto.quantidade, objeto.valor)
+            ).forEach(
+              //adiciona as novas negociações na lista
+              negociacao => this._listaNegociacoes.adiciona(negociacao)
+            )
+          
+          this._mensagem.texto = 'Negociações importadas com sucesso.'
 
-        this._limpaFormulario();
+        } else {
+          console.log('Erro, não foi possível obter as negociações do servidor.');
+          //e xhr.responseText também recebe respostas de erro
+          console.log(xhr.responseText);
+          this._mensagem.texto='Erro, não foi possível obter as negociações do servidor.'
+        }
+      }
+    };
 
-    }
+    xhr.send();
+    */
 
-    apaga() {
-        this._listaNegociacoes.esvazia();
+    //a responsabilidade de buscar dados no servidor não deve ser do controller
+    //por isso crimos 1 service para resolver isso e só vamos tratar os resultados
+    let service = new NegociacaoService();
 
+    //chamamos negociacoe passando uma função callback
+    //tem que ser arrow function por causa do this léxico
+    service.obterNegociacoesDaSemana((erro, negociaoes) => {
+      //usamos uma convenção chamada error first
+      //pega um erro no 1º parametro e o resultado no 2º
+      //e a primeira coisa q fazemos é testar se deu o erro
+      if(erro){
+        this._mensagem.texto = erro;
+        return;
+      } 
 
-        this._mensagem.texto = 'Negociações apagadas'
-        //this._mensagemView.update(this._mensagem);
-    }
+      //adiciona negociações na lista e mostra mensagem de sucesso
+      negociaoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
+      this._mensagem.texto = 'Negociações importadas com sucesso.'
+    })
+  }
 
-    _criaNegociacao() {
-        return new Negociacao(
-            DataHelper.textoParaData(this._inputData.value),
-            this._inputQuantidade.value,
-            this._inputValor.value,
-        );
-    }
+  apaga() {
+    this._listaNegociacoes.esvazia();
+    this._mensagem.texto = 'Negociações apagadas'
+  }
 
-    _limpaFormulario() {
+  _criaNegociacao() {
+    return new Negociacao(
+      DataHelper.textoParaData(this._inputData.value),
+      this._inputQuantidade.value,
+      this._inputValor.value,
+    );
+  }
 
-        this._inputData.value = '';
-        this._inputQuantidade.value = 1;
-        this._inputValor.value = 0.0;
+  _limpaFormulario() {
 
-        this._inputData.focus();
-    }
+    this._inputData.value = '';
+    this._inputQuantidade.value = 1;
+    this._inputValor.value = 0.0;
+
+    this._inputData.focus();
+  }
 
 }

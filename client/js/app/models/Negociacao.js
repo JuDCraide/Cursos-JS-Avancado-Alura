@@ -9,7 +9,6 @@ class Negociacao {
         
         Object.freeze(this);
     }
-
     
     get data(){
         return new Date(this._data.getTime());

@@ -27,9 +27,12 @@ class NegociacoesView extends View {
                 <tfoot>
                     <td colspan='3'></td>
                     <td>${
-                        model.negociacoes.reduce(
+                        //essa solução de chamar reduce não está legal, pq ela é procedural
+                        //portanto vamos criar um método no model para pegar total
+                        /*model.negociacoes.reduce(
                             (total, n) => total + n.volume, 0.0 
-                        )
+                        )*/
+                        model.volumeTotal()
                     }</td>
                 </tfoot>
             </table >
