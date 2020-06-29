@@ -1,8 +1,6 @@
 
 class NegociacoesView extends View {
 
-    //o constructor com o super era desnecessário
-
     template(model) {
         return `
             <table class="table table-hover table-bordered" >
