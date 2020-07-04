@@ -32,79 +32,113 @@ class NegociacaoController {
 
   }
 
-  //iniciamos a API e nosso objetivo é quando o botão importar negociações for clicado
-  //vamos chamar a função que vai retornar as negociações usando requisições AJAX
   importaNegociacoes() {
-    //alert('Importando...');
 
-    /*
-    let xhr = new XMLHttpRequest();
-
-    xhr.open('GET', 'negociacoes/semana');
-    //endereço errado para testar erro
-    //xhr.open('GET', 'negociacoes/semana2');
-
-    //precisamos fazer configurações antes de enviar
-    xhr.onreadystatechange = () => {
-      /*
-      Estados de uma requisição AJAX:
-      0: requisição ainda não iniciada
-      1: conexão com o servidor estabelecida
-      2: requisição recebida
-      3: processando requisição
-      4: requisição está concluída e a resposta está pronta
-      * /
-      //testa se está no último estado ou seja a resposta está pronta
-      if (xhr.readyState === 4) {
-        //mas pode ter ocorrido erro então testamos se o status é 200(OK)
-        if (xhr.status === 200) {
-          console.log('Requisição OK, obtendo as negociações do servidor.');
-          //xhr.responseText mostra a resposta da requisição
-          //usamos JSON.parse para converter de texto para objeto JavaScript
-          console.log(JSON.parse(xhr.responseText));
-
-          JSON.parse(xhr.responseText)
-            .map(
-              //transforma cada objeto retornado pela requisição em uma negociação
-              objeto => new Negociacao(new Date(objeto.data), objeto.quantidade, objeto.valor)
-            ).forEach(
-              //adiciona as novas negociações na lista
-              negociacao => this._listaNegociacoes.adiciona(negociacao)
-            )
-          
-          this._mensagem.texto = 'Negociações importadas com sucesso.'
-
-        } else {
-          console.log('Erro, não foi possível obter as negociações do servidor.');
-          //e xhr.responseText também recebe respostas de erro
-          console.log(xhr.responseText);
-          this._mensagem.texto='Erro, não foi possível obter as negociações do servidor.'
-        }
-      }
-    };
-
-    xhr.send();
-    */
-
-    //a responsabilidade de buscar dados no servidor não deve ser do controller
-    //por isso crimos 1 service para resolver isso e só vamos tratar os resultados
     let service = new NegociacaoService();
 
-    //chamamos negociacoe passando uma função callback
-    //tem que ser arrow function por causa do this léxico
+    //adicionamos as 2 novas chamadas, mas ao executar elas ocorrem fora de ordem
+    //pq elas são assíncronas, então vamos botar uma dentro da outra
+    /*
     service.obterNegociacoesDaSemana((erro, negociaoes) => {
-      //usamos uma convenção chamada error first
-      //pega um erro no 1º parametro e o resultado no 2º
-      //e a primeira coisa q fazemos é testar se deu o erro
       if(erro){
         this._mensagem.texto = erro;
         return;
       } 
-
-      //adiciona negociações na lista e mostra mensagem de sucesso
       negociaoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
       this._mensagem.texto = 'Negociações importadas com sucesso.'
     })
+    
+    service.obterNegociacoesDaSemanaAnterior((erro, negociaoes) => {
+      if(erro){
+        this._mensagem.texto = erro;
+        return;
+      } 
+      negociaoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
+      this._mensagem.texto = 'Negociações importadas com sucesso.'
+    })
+
+    service.obterNegociacoesDaSemanaRetrasada((erro, negociaoes) => {
+      if(erro){
+        this._mensagem.texto = erro;
+        return;
+      } 
+      negociaoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
+      this._mensagem.texto = 'Negociações importadas com sucesso.'
+    })*/
+
+    //colocamos uma dentro da outra, mas esse código é uma piramide e ruim de ler
+    //chamamos essa 'solução' Pyramid of Doom, e o problema das assíncronas de Callback Hell
+    //e ainda temos o teste de erro repetido
+    /*service.obterNegociacoesDaSemana((erro, negociaoes) => {
+      if(erro){
+        this._mensagem.texto = erro;
+        return;
+      }
+      negociaoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
+      service.obterNegociacoesDaSemanaAnterior((erro, negociaoes) => {
+        if(erro){
+          this._mensagem.texto = erro;
+          return;
+        } 
+        negociaoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
+        service.obterNegociacoesDaSemanaRetrasada((erro, negociaoes) => {
+          if(erro){
+            this._mensagem.texto = erro;
+            return;
+          } 
+          negociaoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
+          this._mensagem.texto = 'Negociações importadas com sucesso.'
+        })
+      })
+    })*/
+
+    //vamos usar o método promise no NegociacaoService
+    //mas caimos no mesmo problema de elas ficarem fora de ordem
+    /*service.obterNegociacoesDaSemana()
+      .then(negociacoes => {
+        negociacoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
+        this._mensagem.texto = 'Negociações da semana importadas com sucesso.';
+      }).catch(erro => this._mensagem.texto = erro);
+
+      service.obterNegociacoesDaSemanaAnterior()
+      .then(negociacoes => {
+        negociacoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
+        this._mensagem.texto = 'Negociações da semana anterior importadas com sucesso.';
+      }).catch(erro => this._mensagem.texto = erro);
+
+      service.obterNegociacoesDaSemanaRetrasada()
+      .then(negociacoes => {
+        negociacoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
+        this._mensagem.texto = 'Negociações da semana retrasada importadas com sucesso.';
+      }).catch(erro => this._mensagem.texto = erro);
+    */
+
+    //o método Promise.all() permite resolver varias promises passadas em ordem em um array
+    /*
+    Promise.all([
+      service.obterNegociacoesDaSemana(),
+      service.obterNegociacoesDaSemanaAnterior(),
+      service.obterNegociacoesDaSemanaRetrasada()
+    ]).then(negociacoes => {
+      //mas negociações retorna um array com 3 arrays de negociações
+      console.log(negociacoes);
+
+      //então vamos usar o reduce para achatar o array, e aí fazer o forEach 
+      negociacoes
+        .reduce((arrayAchatado, array) => arrayAchatado.concat(array),[])
+        .forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
+      this._mensagem.texto = 'Negociações da semana retrasada importadas com sucesso.';
+    }).catch(erro => this._mensagem.texto = erro);
+    */
+
+    //passamos o promisse all para o método obterNegociacoes
+    //ele já retorna o array de negociações achatado
+    service.obterNegociacoes()
+      .then(negociacoes => {
+        negociacoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
+        this._mensagem.texto = 'Negociações da semana retrasada importadas com sucesso.';
+      }).catch(erro => this._mensagem.texto = erro);
+
   }
 
   apaga() {
