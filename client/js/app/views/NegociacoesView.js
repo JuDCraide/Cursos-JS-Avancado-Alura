@@ -2,7 +2,6 @@
 class NegociacoesView extends View {
 
     template(model) {
-        //chamamos o método ordena do controler nas colunas
         return `
             <table class="table table-hover table-bordered" >
                 <thead>
@@ -31,7 +30,6 @@ class NegociacoesView extends View {
                 </tfoot>
             </table >
         `;
-    }
-  
-}
+    } 
 
+}

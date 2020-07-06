@@ -44,16 +44,11 @@
       </button>
     </form>
 
-    <script src="js/app/models/Negociacao.js"></script>
-    <script src="js/app/helpers/DateHelper.js"></script>
+    <script src="js/app/services/HttpService.js"></script>
     <script>
       function sendPost(event) {
         event.preventDefault();
         console.log("Enviando post");
-
-        //aqui você deve ler os dados do formulário
-        //construir o json
-        //enviar o XMLHttpRequest
 
         let $ = document.querySelector.bind(document);
 
@@ -61,59 +56,26 @@
         this._inputQuantidade = $("#quantidade");
         this._inputValor = $("#valor");
 
-        //meu código que não funcionou
-        //aparentemente o problema é que a api faz a mesma conversão que o DataHelper
-        //portanto eu não deveria mandar um objeto de Negociacao
-        //mas achei mais confuso
-        /*
-        let negociacao = new Negociacao(
-          DataHelper.textoParaData(this._inputData.value),
-          this._inputQuantidade.value,
-          this._inputValor.value
-        );*/
-
-        //resposta
-        const negociacao2 = {
+        const negociacao = {
           data: _inputData.value,
           quantidade: _inputQuantidade.value,
           valor: _inputValor.value,
         };
 
-        //console.log(negociacao,negociacao2, JSON.stringify(negociacao));
+        //alteramos para usar o novo método post do HttpService
+        new HttpService()
+          .post("/negociacoes", negociacao)
+          .then(() => {
+            this._inputData.value = "";
+            this._inputQuantidade.value = 1;
+            this._inputValor.value = 0.0;
 
-        let xhr = new XMLHttpRequest();
-
-
-        //na resposta manda um terceiro parametro como true
-        //pelo q pesquisei ele manda se a operçã é assincrona
-        //não entendi mto bem pq o meu funcionou sem o true
-        //meu código
-        /*xhr.open("POST", "/negociacoes");*/
-        //resposta
-        xhr.open("POST", "/negociacoes", true);
-
-        xhr.setRequestHeader("Content-type", "application/json");
-
-        xhr.onreadystatechange = () => {
-          if (xhr.readyState == 4) {
-            if (xhr.status == 200) {
-              console.log("OK");
-
-              //tinha esquecido de limpar o formulário
-              this._inputData.value = "";
-              this._inputQuantidade.value = 1;
-              this._inputValor.value = 0.0;
-
-              this._inputData.focus();
-            } else {
-              console.log("Erro");
-              console.log(xhr.responseText);
-            }
-          }
-        };
-
-        //xhr.send(JSON.stringify(negociacao));
-        xhr.send(JSON.stringify(negociacao2));
+            this._inputData.focus();
+          })
+          .catch((erro) => {
+            console.log(erro);
+            alert(`Não foi possível enviar a negociação`);
+          });
       }
     </script>
   </body>

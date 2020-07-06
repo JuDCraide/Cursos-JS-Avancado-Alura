@@ -22,13 +22,10 @@ class ListaNegociacoes {
         )
     }
 
-    //criamos um método ordena que será chamado pelo controle
-    //ele recebe uma função que serve de critério para ordenação
     ordena(critério) {
         this._negociacoes.sort(critério);
     }
 
-    //criamos uma função para inverter a lista
     inverte() {
         this._negociacoes.reverse();
     }

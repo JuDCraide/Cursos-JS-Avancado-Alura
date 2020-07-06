@@ -13,7 +13,6 @@ class NegociacaoController {
       new NegociacoesView($('#negociacoes-view')),
       'adiciona',
       'esvazia',
-      //adicionamos o ordena eo inverte na lista de métodos q atualizam a view
       'ordena',
       'inverte'
     )
@@ -24,7 +23,6 @@ class NegociacaoController {
       'texto'
     )
 
-    //armazena como tabela está sendo ordenada
     this._ordemAtual = '';
   }
 
@@ -68,22 +66,14 @@ class NegociacaoController {
     this._inputData.focus();
   }
 
-  //vamos criar um método para ordenar pela coluna
-  //ele vai ser chamado pelas colunas do negociacoesView
-  ordena(coluna){
-    //como apenas recebemos uma cópia da lista temos que criar um método ordena no model
-    //e passamos uma função que ordena crescentemente EX: a=5 e b=2, a-b=3 -> positivo -> [b,a]
-    //this._listaNegociacoes.ordena((a,b) => a[coluna]-b[coluna]);
 
-    //mas queremos que quando clicamos a segunda vez na coluna
-    //sua oredenação seja invertida(crescente ou decrescente)
-    if(coluna === this._ordemAtual){
-      //se a nova ordem for igual a ordemAtual invertemos a coluna
+  ordena(coluna){
+    if(coluna === this._ordemAtual){ 
       this._listaNegociacoes.inverte();
     } else {
       this._listaNegociacoes.ordena((a,b) => a[coluna]-b[coluna]);
     }
-    //por fim atualizamos _ordemAtual
+    
     this._ordemAtual=coluna;
   }
 }
