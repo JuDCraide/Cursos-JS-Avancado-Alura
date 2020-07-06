@@ -83,7 +83,14 @@
     <script src="js/app/services/NegociacaoService.js"></script>
     <script src="js/app/services/HttpService.js"></script>
     <script>
-      let negociacaoController = new NegociacaoController();
+      //trocamos o let por var
+      //usamos var quando queremos que a variável tenha escopo global ou de função
+      //e usarmos let quando queremos que a variável tenha sempre escopo de bloco
+      //como nosso controller está no escopo global, faz todo sentido usarmos var
+      //isso ajuda na compatibilidade com navegadores antigos
+      //mas para garantir compatibilidade precisamos usar transpilers de ES6 para ES5
+      //transpiler é um compilador de código fonte para código fonte
+      var negociacaoController = new NegociacaoController();
     </script>
   </body>
 </html>

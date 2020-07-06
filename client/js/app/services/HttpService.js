@@ -19,9 +19,6 @@ class HttpService {
     });
   }
 
-  //vamos incramentar a classe HttpService criando um método post
-  //nos baseando no exercício feito em post.html
-  //agora vamos aproveitar essa solução no post.html
   post(url, dado){
     return new Promise((resolve, reject) => {
       let xhr = new XMLHttpRequest();
