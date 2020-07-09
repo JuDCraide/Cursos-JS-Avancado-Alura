@@ -9,46 +9,31 @@
     <script>
 	
       var connection;
-      //a função onupgradeneeded só é chamada quando o segundo parâmetro for maior que o valor atual
-      //esse valor corresponde a versão, então como quando criamos o banco o valor era 1
-      //agora que queremos testar a criação da Object Store temos que mudar para 2
-	  //e para ativar o autoIncremento vamos mudar a versão para 3
       var openRequest = window.indexedDB.open("aluraframe", 3);
 
       openRequest.onupgradeneeded = (e) => {
         console.log("Cria ou altera um banco já existente");
 
-        //acrescentamos uma object store que é semelhante a uma tabela em um banco SQL
         let minhaConnection = e.target.result;
-		//minhaConnection.createObjectStore("negociacoes");
 
-		//como queremos ativar o auto incremento temos que excluir a store anterior
-		//se já existir 'negociacoes' ele excluí e cria a nova com o autoincremento
         if (minhaConnection.objectStoreNames.contains('negociacoes')) {
           minhaConnection.deleteObjectStore("negociacoes");
         }
-		//cria com autoincremento ativo
-		minhaConnection.createObjectStore("negociacoes",{autoIncrement: true});
-      };
 
+		    minhaConnection.createObjectStore("negociacoes",{autoIncrement: true});
+      };
       openRequest.onsuccess = (e) => {
         console.log("Conexão obtida com sucesso");
-        //guardamos a conexão na variável connection
+        
         connection = e.target.result;
       };
-
       openRequest.onerror = (e) => console.log(e.target.error);
 
-      //para testar chamamos adiciona no console do navegador
-	  //mas aparece um erro, pois os objetos não tem um index único
-	  //então vamos acionar o autoIncremento na criação da store
       function adiciona() {
-        //especificamos no primeiro parametro o array com Object Stores que queremos acessar
-        //e no segundo as permissões de acesso, no caso leitura e escrita
+
         let transaction = connection.transaction(["negociacoes"], "readwrite");
         let store = transaction.objectStore("negociacoes");
 
-        //criamos a negociacão e inserimos na store
         let negociacao = new Negociacao(new Date(), 200, 1);
         let request = store.add(negociacao);
 
@@ -61,19 +46,16 @@
 		let transaction = connection.transaction(["negociacoes"], "readwrite");
         let store = transaction.objectStore("negociacoes");
 
-		//openCursor retorna um ponteiro para primeiro dado na tabela
 		let cursor = store.openCursor();
 		let negociacoes = [];
 
 		cursor.onsuccess = e => {
-			//pega o ponteiro se a operação tiver sucesso
 			let atual = e.target.result;
 			
-			//testa atual, pois quando for null chegou ao fim da tabela
 			if(atual){
 				let dado = atual.value;
 				negociacoes.push(new Negociacao(dado._data, dado._quantidade, dado._valor));
-				//abre o cursor no próximo ponteiro
+				
 				atual.continue();
 			} else {
 				console.log(negociacoes);			
@@ -82,6 +64,24 @@
 		cursor.onerror = e => console.log(e.target.error.name);
 		
 	  }
+
+    //queremos cria uma classe ConnectionFactory que respeite
+    //a) getConnection vai ser estático -> chamado direto da classe
+    //b) getConnection retorna uma promisse, pq é assíncrono
+    //c) não importa quantas vezes seja chamar getConnection a conexão deve ser a mesma
+    //d) não pode chamar close diretamente, só pode ser fechada através da ConnectionFactory
+    ConnectionFactory
+      .getConnection()
+      .then(connection => {
+        //usa conexão
+    });
+
+    ConnectionFactory
+      .getConnection()
+      .then(connection => {
+        //conexão tem que ser a mesma 
+    });
+
     </script>
   </body>
 </html>
