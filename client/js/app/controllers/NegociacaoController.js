@@ -1,79 +1,119 @@
 class NegociacaoController {
 
-  constructor() {
+	constructor() {
 
-    let $ = document.querySelector.bind(document);
+		let $ = document.querySelector.bind(document);
 
-    this._inputData = $('#data');
-    this._inputQuantidade = $('#quantidade');
-    this._inputValor = $('#valor');
+		this._inputData = $('#data');
+		this._inputQuantidade = $('#quantidade');
+		this._inputValor = $('#valor');
 
-    this._listaNegociacoes = new Bind(
-      new ListaNegociacoes(),
-      new NegociacoesView($('#negociacoes-view')),
-      'adiciona',
-      'esvazia',
-      'ordena',
-      'inverte'
-    )
+		this._listaNegociacoes = new Bind(
+			new ListaNegociacoes(),
+			new NegociacoesView($('#negociacoes-view')),
+			'adiciona',
+			'esvazia',
+			'ordena',
+			'inverte'
+		)
 
-    this._mensagem = new Bind(
-      new Mensagem(),
-      new MensagemView($('#mensagem-view')),
-      'texto'
-    )
+		this._mensagem = new Bind(
+			new Mensagem(),
+			new MensagemView($('#mensagem-view')),
+			'texto'
+		)
 
-    this._ordemAtual = '';
-  }
+		this._ordemAtual = '';
 
-  adiciona(event) {
+		//vamos adicionar na lista as negociações do banco
+		//usamos arrow functions e then para reduzir o código e tornar ele mais legível
+		ConnectionFactory.getConnection()
+			.then(connection => new NegociacaoDao(connection))
+			.then(dao => dao.listaTodos())
+			.then(negociacoes => negociacoes.forEach(negociacao =>
+				this._listaNegociacoes.adiciona(negociacao)
+			)).catch(erro => this._mensagem.texto = erro);
 
-    event.preventDefault();
-    this._listaNegociacoes.adiciona(this._criaNegociacao());
-    this._mensagem.texto = 'Negociação adicionada';
-    this._limpaFormulario();
-  }
+	}
 
-  importaNegociacoes() {
+	adiciona(event) {
 
-    let service = new NegociacaoService();
+		event.preventDefault();
 
-    service.obterNegociacoes()
-      .then(negociacoes => {
-        negociacoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
-        this._mensagem.texto = 'Negociações da semana retrasada importadas com sucesso.';
-      }).catch(erro => this._mensagem.texto = erro);
-  }
+		/*
+		this._listaNegociacoes.adiciona(this._criaNegociacao());
+		this._mensagem.texto = 'Negociação adicionada';
+		this._limpaFormulario();
+		*/
 
-  apaga() {
-    this._listaNegociacoes.esvazia();
-    this._mensagem.texto = 'Negociações apagadas'
-  }
+		//adicionamos a negociação no banco
+		ConnectionFactory.getConnection()
+			.then(connection => {
+				let negociacao = this._criaNegociacao();
+				new NegociacaoDao(connection).adiciona(negociacao)
+					.then(() => {
+						//a negociação só é adicionada na lista se for adicionada no banco com sucesso
+						this._listaNegociacoes.adiciona(negociacao);
+						this._mensagem.texto = 'Negociação adicionada';
+						this._limpaFormulario();
+					});
+			}).catch(erro => this._mensagem.texto = erro);
 
-  _criaNegociacao() {
-    return new Negociacao(
-      DataHelper.textoParaData(this._inputData.value),
-      this._inputQuantidade.value,
-      this._inputValor.value,
-    );
-  }
+	}
 
-  _limpaFormulario() {
-    this._inputData.value = '';
-    this._inputQuantidade.value = 1;
-    this._inputValor.value = 0.0;
+	importaNegociacoes() {
 
-    this._inputData.focus();
-  }
+		let service = new NegociacaoService();
+
+		service.obterNegociacoes()
+			.then(negociacoes => {
+				negociacoes.forEach(negociacao => this._listaNegociacoes.adiciona(negociacao));
+				this._mensagem.texto = 'Negociações da semana retrasada importadas com sucesso.';
+			}).catch(erro => this._mensagem.texto = erro);
+	}
+
+	apaga() {
+
+		/*
+		this._listaNegociacoes.esvazia();
+		this._mensagem.texto = 'Negociações apagadas'
+		*/
+		ConnectionFactory.getConnection()
+		.then(connection => new NegociacaoDao(connection))
+		.then(dao => dao.apagaTodos())
+		.then(mensagem => {
+			this._mensagem.texto = mensagem
+			this._listaNegociacoes.esvazia();
+		});
+
+	}
+
+	_criaNegociacao() {
+		return new Negociacao(
+			DataHelper.textoParaData(this._inputData.value),
+			//vamos garantir que o valor e a quantidade são float e inteiro
+			//respectivamente antes de salvar no banco
+			parseInt(this._inputQuantidade.value),
+			parseFloat(this._inputValor.value),
+		);
+	}
+
+	_limpaFormulario() {
+		this._inputData.value = '';
+		this._inputQuantidade.value = 1;
+		this._inputValor.value = 0.0;
+
+		this._inputData.focus();
+	}
 
 
-  ordena(coluna){
-    if(coluna === this._ordemAtual){ 
-      this._listaNegociacoes.inverte();
-    } else {
-      this._listaNegociacoes.ordena((a,b) => a[coluna]-b[coluna]);
-    }
-    
-    this._ordemAtual=coluna;
-  }
+	ordena(coluna) {
+		if (coluna === this._ordemAtual) {
+			this._listaNegociacoes.inverte();
+		} else {
+			this._listaNegociacoes.ordena((a, b) => a[coluna] - b[coluna]);
+		}
+
+		this._ordemAtual = coluna;
+	}
 }
