@@ -65,22 +65,7 @@
         };
         cursor.onerror = (e) => console.log(e.target.error.name);
       }
-
-      //Com o connectionFactory já abstraimos uma boa parte do nosso teste
-      //porém ainda teriamos que fazer o adicionar na mão
-      //então vamos usar o padrão DAO -> Data Access Object para fazer a persistência
-      //o DAO é usado para abstrair detalhes de lidar com o banco
-      //queramos no final poder fazer:
-      /*ConnectionFactory.getConnection()
-        .then(connection => {
-            let dao = new NegociacaoDAO(connection);
-            let negociacao = new Negociacao(new Date(), 1, 100);
-            dao.adiciona(negociacao)
-              .then() => {
-                //faz alguma coisa
-              };
-        });
-      */ 
+      
     </script>
   </body>
 </html>

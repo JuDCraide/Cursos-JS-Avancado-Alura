@@ -20,4 +20,15 @@ class Negociacao {
     get volume(){
         return this._quantidade * this._valor;
     }
+
+    //como no nosso programa precisamos verificar se uma negociação e igual a outra
+    //criamos o método equals que compara a negociação(this) com outra passada por parâmetro
+    equals(outraNegociacao){
+        return JSON.stringify(this) == JSON.stringify(outraNegociacao);
+        //também poderiamos fazer assim, comparando cada um dos atributos:
+        /*return this._data.getTime() == outraNegociacao.data.getTime()
+            && this._valor == outraNegociacao.valor
+            && this._quantidade == outraNegociacao.quantidade;
+            */
+    }
 }
