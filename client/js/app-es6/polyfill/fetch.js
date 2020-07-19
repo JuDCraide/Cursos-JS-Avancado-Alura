@@ -1,4 +1,3 @@
-//copiei o polyfill do download da aula, pois o anterior não estava funcionando com o babel
 (function(self) {
   'use strict';
 

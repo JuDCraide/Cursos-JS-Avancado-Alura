@@ -1,4 +1,4 @@
-class DataHelper {
+export class DataHelper {
     
     constructor() {
         throw new Error('A classe DateHelper não pode ser instânciada');
