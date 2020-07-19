@@ -1,0 +1,16 @@
+//vamos lidar com o problema da compatibilidade com navegadores antigos usando um transpiler
+//primeiramente trocamos o nome da nossa pasta app para app-es6
+//pq os arquivos q vão ser compilados do es6 para es5 ficarão na pasta app
+//ao fazer npm init foi criado o package.json nele vemos informações sobre o projeto
+//então instalamos o babel(transpiler/transcompilador) e um preset es2015
+//e podemos ver que o babel e o preset foram instalados como dependencia de desenvolvimento
+//além disso foi criada a pasta node_modules onde estão as dependencias
+{
+    //configurando o preset do babel
+    "presets":["es2015"]
+}
+//criamos um script build no package.json, para que o babel faça a conversão -> "build": "babel js/app-es6 -d js/app"
+//ao rodar npm run build e criada novamente a pasta app com os arquivos convertidos
+//acrescentamos no final nosso scrip build --source-maps -> "build": "babel js/app-es6 -d js/app --source-maps"
+//para que se ocorrer um erro o console mostre a linha nos arquivos do app-es6
+//crimos um script watch que recompila a cada atualização no arquivos do app-es6 -> "watch": "babel js/app-es6 -d js/app --source-maps --watch"
