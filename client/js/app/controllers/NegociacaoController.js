@@ -162,7 +162,6 @@ System.register(['../models/ListaNegociacoes', '../models/Mensagem', '../views/N
 
 			negociacaoController = new NegociacaoController();
 			function currentInstance() {
-
 				return negociacaoController;
 			}
 

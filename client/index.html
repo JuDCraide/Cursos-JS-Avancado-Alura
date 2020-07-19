@@ -61,16 +61,12 @@
     <div id="negociacoes-view"></div>
 
     <script src="node_modules/systemjs/dist/system.js"></script>
-    <script>
-      //configurações o systemJS
-      //essa configuração permite omitir a extenção .js ao incluir arquivos
+    <script>     
       System.defaultJSExtensions = true;
-      //vamos criar um artquivo boot que vai ser o primeiro a ser carregado
+
       System.import("js/app/boot").catch(function (err) {
         console.error(err);
       });
-      //com isso não precisamos mais das outras importações
-      //nem precisamos instanciar o negociacaoController globalmente
     </script>
   </body>
 </html>

@@ -7,7 +7,6 @@ import {DataHelper} from '../helpers/DateHelper';
 import {Bind} from '../helpers/Bind';
 import {Negociacao} from '../models/Negociacao';
 
-//export class NegociacaoController {
 class NegociacaoController {
 	constructor() {
 
@@ -84,7 +83,6 @@ class NegociacaoController {
 				this._mensagem.texto = mensagem;
 				this._listaNegociacoes.esvazia();
 			}).catch(erro => this._mensagem.texto = erro)
-
 	}
 
 	_criaNegociacao() {
@@ -115,11 +113,8 @@ class NegociacaoController {
 
 }
 
-//ao invés de expotar a classe NegociacaoController, vamos exportar uma instância
-//como só terá uma instância dessa classe chamamos esse padrão de Singleton
 let negociacaoController = new NegociacaoController();
+
 export function currentInstance() {
-
     return negociacaoController;
-
 }

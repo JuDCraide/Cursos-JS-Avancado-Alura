@@ -1,5 +1,4 @@
 {
     "presets":["es2015"],
-    //baixamos e configuramos um plugin do babel para usar o SystemJS
     "plugins": ["transform-es2015-modules-systemjs"]
 }

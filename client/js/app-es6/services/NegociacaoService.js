@@ -96,4 +96,5 @@ export class NegociacaoService {
 				throw new Error(erro);
 			});
 	}
+	
 }

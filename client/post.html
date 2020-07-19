@@ -62,7 +62,6 @@
           valor: _inputValor.value,
         };
 
-        //alteramos para usar o novo método post do HttpService
         new HttpService()
           .post("/negociacoes", negociacao)
           .then(() => {

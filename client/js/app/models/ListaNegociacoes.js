@@ -33,7 +33,7 @@ System.register([], function (_export, _context) {
             }();
 
             _export("ListaNegociacoes", ListaNegociacoes = function () {
-                function ListaNegociacoes(armadilha) {
+                function ListaNegociacoes() {
                     _classCallCheck(this, ListaNegociacoes);
 
                     this._negociacoes = [];
